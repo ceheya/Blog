@@ -1,0 +1,61 @@
+# .github/workflows/deploy.yml
+
+name: Deploy to Server via SSH
+
+# 触发条件：当有代码 push 到 main 分支时
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    # 运行环境：使用最新的 Ubuntu 系统
+    runs-on: ubuntu-latest
+
+    steps:
+      # 第 1 步：拉取你的代码
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 第 2 步：设置 Node.js 环境 (根据你的项目需求)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # 或者 20, 根据你项目需要的版本
+          cache: 'pnpm' # 开启 pnpm 依赖缓存，加快后续构建速度
+
+      # 第 3 步：安装 pnpm
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8 # 或者你使用的 pnpm 版本
+
+      # 第 4 步：安装项目依赖
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 第 5 步：打包项目
+      - name: Build Project
+        run: pnpm run build # 这里执行你在 package.json 中定义的 build 命令
+
+      # 第 6 步：部署到服务器
+      - name: Deploy to Server
+        uses: easingthemes/ssh-deploy@v5.0.0
+        with:
+          # 从 GitHub Secrets 中获取私钥
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+          # 要部署的源文件夹 (打包后的 dist 目录)
+          SOURCE: "dist/"
+
+          # 服务器信息
+          REMOTE_HOST: "119.91.235.233"
+          REMOTE_USER: "root"
+
+          # 部署到服务器的目标路径 (你的网站根目录)
+          # 请根据你的实际情况修改这个路径!!!
+          TARGET: "/opt/blog/" # 或者 /opt/zhuye/ 等
+
+          # rsync 的参数，-avz 增量同步, --delete 删除服务器上多余的文件
+          ARGS: "-avz --delete"
