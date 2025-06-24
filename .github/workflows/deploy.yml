@@ -1,61 +1,78 @@
-# .github/workflows/deploy.yml
+# 文件路径: .github/workflows/deploy.yml
+# 功能: 当代码推送到 main 分支时，自动构建并部署网站到您的服务器
 
-name: Deploy to Server via SSH
+name: Deploy Website to Server
 
-# 触发条件：当有代码 push 到 main 分支时
+# 触发工作流的事件
 on:
+  # 当有代码被推送到 main 分支时触发
   push:
     branches:
       - main
 
+# 工作流包含的任务
 jobs:
+  # 定义一个名为 "build-and-deploy" 的任务
   build-and-deploy:
-    # 运行环境：使用最新的 Ubuntu 系统
+    # 指定任务运行的虚拟环境
     runs-on: ubuntu-latest
 
+    # 任务执行的步骤
     steps:
-      # 第 1 步：拉取你的代码
+      # 第 1 步: 检出代码
+      # 从您的仓库中拉取最新的代码到虚拟环境中
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 第 2 步：设置 Node.js 环境 (根据你的项目需求)
+      # 第 2 步: 设置 Node.js 环境
+      # 安装指定版本的 Node.js，并配置 pnpm 的缓存以加快后续构建
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18' # 或者 20, 根据你项目需要的版本
-          cache: 'pnpm' # 开启 pnpm 依赖缓存，加快后续构建速度
+          node-version: '18' # 您可以根据项目需要修改为 '20' 等
+          cache: 'pnpm'
 
-      # 第 3 步：安装 pnpm
+      # 第 3 步: 安装 pnpm
+      # 这是关键的修复步骤，确保 pnpm 命令可用
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
         with:
-          version: 8 # 或者你使用的 pnpm 版本
+          version: 8 # 您可以指定 pnpm 的版本，例如 8
 
-      # 第 4 步：安装项目依赖
+      # 第 4 步: 安装项目依赖
+      # 使用 pnpm 安装 package.json 中定义的所有依赖项
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      # 第 5 步：打包项目
+      # 第 5 步: 构建项目
+      # 执行 package.json 中的 "build" 脚本，生成静态文件到 dist 目录
       - name: Build Project
-        run: pnpm run build # 这里执行你在 package.json 中定义的 build 命令
+        run: pnpm run build
 
-      # 第 6 步：部署到服务器
+      # 第 6 步: 部署到服务器
+      # 使用 rsync 通过 SSH 将构建好的 dist 目录同步到您的服务器
       - name: Deploy to Server
         uses: easingthemes/ssh-deploy@v5.0.0
         with:
-          # 从 GitHub Secrets 中获取私钥
+          # SSH 私钥，从 GitHub Secrets 中安全地读取
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
-          # 要部署的源文件夹 (打包后的 dist 目录)
+          # 要部署的源文件夹
           SOURCE: "dist/"
 
-          # 服务器信息
+          # 远程服务器的主机名或 IP 地址
           REMOTE_HOST: "119.91.235.233"
+
+          # 登录服务器的用户名
           REMOTE_USER: "root"
 
-          # 部署到服务器的目标路径 (你的网站根目录)
-          # 请根据你的实际情况修改这个路径!!!
-          TARGET: "/opt/blog/" # 或者 /opt/zhuye/ 等
+          # 部署到服务器上的目标目录
+          # !!! 请根据您的实际情况确认此路径是否正确 !!!
+          TARGET: "/opt/blog/"
 
-          # rsync 的参数，-avz 增量同步, --delete 删除服务器上多余的文件
+          # rsync 命令的额外参数
+          # -a: 归档模式，保留文件属性
+          # -v: 详细模式，显示传输过程
+          # -z: 压缩传输，加快速度
+          # --delete: 删除目标目录中源目录没有的文件，保持完全同步
           ARGS: "-avz --delete"
