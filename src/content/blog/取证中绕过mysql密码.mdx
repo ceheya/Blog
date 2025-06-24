@@ -1,0 +1,67 @@
+---
+title: "取证中绕过mysql密码
+"
+description: ""
+pubDate: 2025 4 30
+image: /image/executing-bash-script-on-multiple-remote-server.jpg
+categories:
+  - tech
+tags:
+  - bash
+  - linux
+  - mysql
+---
+
+import Collapse from "../../components/mdx/Collapse.astro";
+import Diff from "../../components/mdx/Diff.astro";
+import Error from "../../components/mdx/Error.astro";
+import Info from "../../components/mdx/Info.astro";
+import Kbd from "../../components/mdx/Kbd.astro";
+import Success from "../../components/mdx/Success.astro";
+import Warning from "../../components/mdx/Warning.astro";
+import TimeLine from "../../components/mdx/TimeLine.astro";
+import LinkCard from "../../components/mdx/LinkCard.astro";
+
+
+# skip-grant-tables 绕过密码验证
+### 1.找到mysql的配置文件
+- /etc/my.cnf
+
+- /etc/mysql/my.cnf
+
+- /etc/mysql/mysql.conf.d/mysqld.cnf （某些 Debian/Ubuntu 系统）
+### 2.修改配置文件
+```bash
+[mysqld] #在mysqld的正下方添加 skip-grant-tables
+skip-grant-tables
+```
+#### 如果没有有vim vi 等编辑工具
+```bash
+sed -i '/\[mysqld\]/a skip-grant-tables' /etc/my.cnf
+```
+### 3.重启服务
+```bash
+sudo systemctl restart mysql
+```
+或者根据你的系统配置：
+```bash
+sudo systemctl restart mysqld
+```
+### 4.修改密码
+<Warning> 进入mysql之后一定要执行 FLUSH PRIVILEGES; 否则无法修改密码</Warning>
+```sql
+mysql -u root -p  # 不用输入密码，直接两次回车即可
+ 
+FLUSH PRIVILEGES;
+ 
+ALTER USER 'root'@'localhost' IDENTIFIED BY '123456';
+ 
+ALTER USER 'root'@'%' IDENTIFIED BY '123456';
+ 
+FLUSH PRIVILEGES;
+```
+### 5.删除 skip-grant-tables 即可对外连接 （不删除无法正常从外部连接）
+<Warning> 如果没有有vim vi 等编辑工具 </Warning>
+```bash
+sed -i "s/skip-grant-tables/ /" /etc/my.cnf
+```

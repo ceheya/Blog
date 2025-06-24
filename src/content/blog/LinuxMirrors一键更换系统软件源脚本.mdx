@@ -1,0 +1,38 @@
+---
+title: "LinuxMirrors一键更换系统软件源脚本
+"
+description: 脚本使换源更简单 - LinuxMirrors
+pubDate: 2025 4 28
+image: /image/executing-bash-script-on-multiple-remote-server.jpg
+categories:
+  - tech
+tags:
+  - bash
+  - linux
+---
+
+import Collapse from "../../components/mdx/Collapse.astro";
+import Diff from "../../components/mdx/Diff.astro";
+import Error from "../../components/mdx/Error.astro";
+import Info from "../../components/mdx/Info.astro";
+import Kbd from "../../components/mdx/Kbd.astro";
+import Success from "../../components/mdx/Success.astro";
+import Warning from "../../components/mdx/Warning.astro";
+import TimeLine from "../../components/mdx/TimeLine.astro";
+import LinkCard from "../../components/mdx/LinkCard.astro";
+
+
+# 中国大陆
+```bash
+bash <(curl -sSL https://linuxmirrors.cn/main.sh)
+```
+
+# 境外以及海外地区
+```bash
+bash <(curl -sSL https://linuxmirrors.cn/main.sh) --abroad
+```
+
+# 中国大陆教育网
+```bash
+bash <(curl -sSL https://linuxmirrors.cn/main.sh) --edu
+```

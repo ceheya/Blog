@@ -1,0 +1,64 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { Icon } from "astro-icon/components";
+import MainCard from "@/components/MainCard.astro";
+import FeatureCard from "@/components/mdx/FeatureCard.astro";
+import GitHubStats from "@/components/mdx/GitHubStats.astro";
+---
+
+
+<BaseLayout title="Home">
+  <MainCard
+    title="Welcome to My Blog"
+    description="你好呀！欢迎访问我的博客,小猫猫正在看着你呢！"
+    textOverlay="HOME"
+    infoIcon="lucide:info"
+  >
+    <div class="space-y-8">
+      <!-- Hero Section -->
+      <section class="py-6">
+        <div class="flex flex-col items-center text-center">
+          <h1 class="text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            🌟 欢迎来到kenny的blog
+          </h1>
+          <p class="text-xl text-base-content/80 max-w-3xl mb-8">
+            我是一名在校学生，在忙碌的学习之余，我热衷于探索和记录生活中的点点滴滴。在这里，你将看到我的学习心得、生活感悟以及对美好事物的热爱。欢迎你的到来，我们一起分享成长的每一步！
+          </p>
+          <div class="flex flex-wrap gap-4 justify-center">
+            <a href="/blog" class="btn btn-primary gap-2 btn-shine-effect">
+              <Icon name="lucide:book-open" class="w-5 h-5" />
+              <span>浏览我的Blog</span>
+            </a>
+            <a href="https://viken.top/" target="_blank" class="btn btn-outline gap-2">
+              <Icon name="lucide:home" class="w-5 h-5" />
+              <span>回到我的主页</span>
+            </a>
+            <a href="https://pan.viken.top/" target="_blank" class="btn btn-outline gap-2">
+              <Icon name="lucide:cloud" class="w-5 h-5" />
+              <span>前往我的网盘</span>
+            </a>
+          </div>
+        </div>
+      </section>
+      
+      <section class="py-6">
+  <div class="max-w-md mx-auto p-6 bg-base-100 rounded shadow text-center">
+    <p class="text-xl font-medium">
+      本站已运行 <span id="live-days" class="font-bold text-primary"></span> 天
+    </p>
+  </div>
+</section>
+
+<!-- 插入客户端脚本 -->
+<script is:inline>
+  const buildDate = new Date("2025-04-24");
+  const today = new Date();
+  const diffTime = today.getTime() - buildDate.getTime();
+  const liveDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+  document.getElementById('live-days').textContent = liveDays;
+</script>
+      
+    </div>
+  </MainCard>
+</BaseLayout>

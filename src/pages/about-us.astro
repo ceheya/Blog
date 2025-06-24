@@ -1,0 +1,113 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { Icon } from "astro-icon/components";
+import MainCard from "@/components/MainCard.astro";
+import GitHubStats from "@/components/mdx/GitHubStats.astro";
+---
+
+<BaseLayout title="About">
+  <MainCard
+    title="About SunMaple"
+    description="Developer, open-source enthusiast, and creator of the Frosti blog theme."
+    textOverlay="ABOUT"
+    infoIcon="lucide:user"
+  >
+    <div class="space-y-10 mb-8">
+      <!-- Profile Section -->
+      <section class="flex flex-col md:flex-row gap-8 items-center md:items-start">
+        <div class="avatar">
+          <div
+            class="w-32 h-32 md:w-40 md:h-40 rounded-xl ring ring-primary ring-offset-base-100 ring-offset-2 overflow-hidden"
+          >
+            <img src="https://img.viken.top/i/2025/04/24/6809a0bd64dda.png" alt="SunMaple" width="160" height="160" loading="eager" />
+          </div>
+        </div>
+
+        <div class="flex-1 text-center md:text-left">
+          <h1 class="text-3xl md:text-4xl font-bold mb-2">Kenny</h1>
+          <p class="text-xl text-base-content/80 mb-4">無限進步</p>
+
+          <div class="flex flex-wrap gap-3 justify-center md:justify-start mb-6">
+            <a
+              href="https://github.com/ceheya"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-sm btn-outline gap-2"
+            >
+              <Icon name="lucide:github" class="w-4 h-4" />
+              <span>GitHub</span>
+            </a>
+            <a
+              href="https://space.bilibili.com/216226164"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-sm btn-outline gap-2"
+            >
+              <Icon name="ri:bilibili-line" class="w-4 h-4" />
+              <span>BiliBili</span>
+            </a>
+            <a href="mailto:patiences6092@gmail.com" class="btn btn-sm btn-outline gap-2">
+              <Icon name="lucide:mail" class="w-4 h-4" />
+              <span>Email</span>
+            </a>
+          </div>
+
+          <p class="text-base-content/80">
+            你好！很高兴认识你👋，我叫Kenny，是一名学生，对编程和网络技术充满了兴趣
+            欢迎来到我的博客！
+          </p>
+        </div>
+      </section>
+      <section class="flex flex-col md:flex-row gap-8 items-center md:items-start">
+        <div class="avatar">
+          <div
+            class="w-32 h-32 md:w-40 md:h-40 rounded-xl ring ring-primary ring-offset-base-100 ring-offset-2 overflow-hidden"
+          >
+            <img src="https://img.viken.top/i/2025/05/19/682aea4d202d7.jpg" alt="SunMaple" width="160" height="160" loading="eager" />
+          </div>
+        </div>
+
+        <div class="flex-1 text-center md:text-left">
+          <h1 class="text-3xl md:text-4xl font-bold mb-2">whiteBoard</h1>
+          <p class="text-xl text-base-content/80 mb-4">喜欢小鸡 喜欢向日葵的小心心</p>
+          <p class="text-base-content/80">
+          哈喽！大家好呀！
+          </p>
+        </div>
+      </section>
+      
+      
+      <!-- Tech Stack -->
+      <section>
+        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+          <Icon name="lucide:code-2" class="w-6 h-6 text-primary" />
+          <span>技术栈</span>
+        </h2>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          {
+            [
+              { name: "Python", icon: "simple-icons:python", color: "oklch(0.7 0.2 250)" },
+              { name: "Java", icon: "simple-icons:openjdk", color: "oklch(0.7 0.2 250)" },
+              { name: "JavaScript", icon: "simple-icons:javascript", color: "oklch(0.8 0.2 80)" },
+              { name: "Node.js", icon: "simple-icons:nodedotjs", color: "oklch(0.7 0.2 140)" },
+              { name: "HTML5", icon: "simple-icons:html5", color: "oklch(0.7 0.2 30)" },
+              { name: "CSS3", icon: "simple-icons:css3", color: "oklch(0.7 0.2 220)" },
+              { name: "Git", icon: "simple-icons:git", color: "oklch(0.7 0.2 30)" },
+              { name: "C++", icon: "simple-icons:cplusplus", color: "oklch(0.6 0.2 240)" },
+              { name: "C#", icon: "simple-icons:csharp", color: "oklch(0.6 0.2 160)" },
+            ].map((tech) => (
+              <div class="flex flex-col items-center justify-center p-4 bg-base-200 rounded-lg hover:bg-base-300 transition-colors">
+                <div class="text-3xl mb-2" style={`color: ${tech.color}`}>
+                  <Icon name={tech.icon} class="w-10 h-10" />
+                </div>
+                <span class="text-sm font-medium">{tech.name}</span>
+              </div>
+            ))
+          }
+        </div>
+      </section>
+      
+    </div>
+  </MainCard>
+</BaseLayout>
