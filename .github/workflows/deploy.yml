@@ -1,6 +1,6 @@
-# Force re-run
 # 文件路径: .github/workflows/deploy.yml
 # 功能: 当代码推送到 main 分支时，自动构建并部署网站到您的服务器
+# 版本: 已修正 pnpm 安装顺序
 
 name: Deploy Website to Server
 
@@ -25,20 +25,20 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 第 2 步: 设置 Node.js 环境
-      # 安装指定版本的 Node.js，并配置 pnpm 的缓存以加快后续构建
+      # 第 2 步: 安装 pnpm (关键改动：已提前)
+      # 提前安装 pnpm，确保后续步骤可以找到 pnpm 命令
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8 # 您可以指定 pnpm 的版本，例如 8
+
+      # 第 3 步: 设置 Node.js 环境
+      # 安装指定版本的 Node.js，并让它使用已安装的 pnpm 来处理缓存
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18' # 您可以根据项目需要修改为 '20' 等
           cache: 'pnpm'
-
-      # 第 3 步: 安装 pnpm
-      # 这是关键的修复步骤，确保 pnpm 命令可用
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 8 # 您可以指定 pnpm 的版本，例如 8
 
       # 第 4 步: 安装项目依赖
       # 使用 pnpm 安装 package.json 中定义的所有依赖项
@@ -72,8 +72,4 @@ jobs:
           TARGET: "/opt/blog/"
 
           # rsync 命令的额外参数
-          # -a: 归档模式，保留文件属性
-          # -v: 详细模式，显示传输过程
-          # -z: 压缩传输，加快速度
-          # --delete: 删除目标目录中源目录没有的文件，保持完全同步
           ARGS: "-avz --delete"
