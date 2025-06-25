@@ -27,6 +27,15 @@ import LinkCard from "../../components/mdx/LinkCard.astro";
 bash <(curl -sSL https://linuxmirrors.cn/main.sh)
 ```
 
+<Collapse title="如果出现问题可以运行以下命令.">
+  ```bash
+  sudo wget https://archive.kali.org/archive-keyring.gpg -O /usr/share/keyrings/kali-archive-keyring.gpg
+  sudo mv /etc/apt/apt.conf.d/50command-not-found /etc/apt/apt.conf.d/50command-not-found.disabled
+  #再运行一遍bash <(curl -sSL https://linuxmirrors.cn/main.sh)即可
+  ```
+</Collapse>
+
+<br />
 # 境外以及海外地区
 ```bash
 bash <(curl -sSL https://linuxmirrors.cn/main.sh) --abroad

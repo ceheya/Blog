@@ -25,3 +25,6 @@ pnpm-debug.log*
 
 # pagefind
 public/pagefind/
+
+src/content/blog/Markdown 样式指南.md
+src/content/blog/frosti-mdx.mdx

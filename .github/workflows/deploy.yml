@@ -14,21 +14,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      # ------------------------------------------------------------------
-      # 第一步：设置 Node.js 和 pnpm，然后构建您的 Astro 博客
-      # ------------------------------------------------------------------
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18' # 或者您在 package.json engines 字段中指定的版本
-          # cache: 'pnpm' # pnpm/action-setup 会处理缓存，这里可以不指定或指定为 pnpm
-
+          node-version: '18'
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9 # 指定您使用的 pnpm 版本，可以从 `pnpm --version` 查看，或者省略以使用最新版
-          run_install: false # 我们将在下一步显式运行 install
+          version: 9
+          run_install: false
 
       - name: Get pnpm store directory
         id: pnpm-cache
@@ -45,21 +39,16 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile # 使用 --frozen-lockfile 确保使用锁文件的版本
+        run: pnpm install --frozen-lockfile
 
       - name: Build Astro project
-        run: pnpm run build # 假设您的 package.json scripts 中有 "build": "astro build"
-
-      # ------------------------------------------------------------------
-      # 第二步：将构建好的文件部署到服务器
-      # ------------------------------------------------------------------
+        run: pnpm run build
       - name: Deploy to Server via rsync
         uses: easingthemes/ssh-deploy@v5.0.0
         env:
           SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_KEY }}
           ARGS: "-rlgoDzvc --delete --exclude='.git*'"
-          SOURCE: "dist/"             # Astro 构建的默认输出目录是 "dist/"
+          SOURCE: "dist/"
           REMOTE_HOST: ${{ secrets.SERVER_HOST }}
           REMOTE_USER: ${{ secrets.SERVER_USERNAME }}
-          TARGET: ${{ secrets.TARGET_PATH }}      # 您服务器上部署的目标路径 (例如 /opt/blog/)
-          # SSH_PORT: ${{ secrets.SERVER_PORT || 22 }} # 如果您的 SSH 端口不是22
+          TARGET: ${{ secrets.TARGET_PATH }} 
