@@ -1,63 +1,42 @@
-name: Deploy Website to Server
+# .github/workflows/deploy.yml
+
+name: Deploy Blog to Server # 工作流程的名称
 
 on:
   push:
     branches:
-      - main
+      - main # 仅在推送到 main 分支时触发
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
+  deploy:
+    runs-on: ubuntu-latest # 使用最新的 Ubuntu 运行器
+
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - name: Checkout repository # 第一步：检出代码
+        uses: actions/checkout@v4 # 使用官方的 checkout action
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: latest
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'pnpm'
-
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build Project
-        run: pnpm run build
-
-      # ====================================================================
-      # 核心测试步骤：直接使用 SSH 命令测试连接
-      # ====================================================================
-      - name: Test SSH Connection Directly
-        run: |
-          # 1. 为了安全，先创建一个临时的 .ssh 目录
-          mkdir -p ~/.ssh/
-          
-          # 2. 将我们的私钥从 GitHub Secrets 写入一个临时文件
-          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/deploy_key
-          
-          # 3. 设置私钥文件的正确权限，这是 SSH 的强制要求
-          chmod 600 ~/.ssh/deploy_key
-          
-          # 4. 使用原生的 ssh 命令进行连接测试
-          #    -i 指定使用我们刚刚创建的私钥文件
-          #    -o StrictHostKeyChecking=no 避免首次连接时的交互式提问
-          #    最后的 'echo "..."' 是要在服务器上执行的命令
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no root@119.91.235.233 'echo "✅ SSH connection successful!"'
-
-      # ====================================================================
-      # 我们暂时注释掉原来的部署步骤，先不让它运行
-      # ====================================================================
-      # - name: Deploy to Server
-      #   uses: easingthemes/ssh-deploy@v5.0.0
+      # 如果您的博客需要构建步骤，请在这里添加
+      # 例如，使用 Hugo 构建：
+      # - name: Setup Hugo
+      #   uses: peaceiris/actions-hugo@v2
       #   with:
-      #     sshPrivateKey: ${{ secrets.DEPLOY_KEY }}
-      #     SOURCE: "dist/"
-      #     REMOTE_HOST: "119.91.235.233"
-      #     REMOTE_USER: "root"
-      #     TARGET: "/opt/blog/"
-      #     ARGS: "-avz --delete"
+      #     hugo-version: 'latest'
+      # - name: Build Hugo site
+      #   run: hugo
+
+      - name: Deploy to Server via SSH # 第二步：通过 SSH 部署
+        uses: appleboy/ssh-action@master # 一个流行的 SSH action
+        with:
+          host: ${{ secrets.SERVER_HOST }}         # 服务器 IP 地址或域名
+          username: ${{ secrets.SERVER_USERNAME }}   # 登录服务器的用户名
+          key: ${{ secrets.DEPLOY_KEY }}          # 您刚刚添加的 SSH 私钥
+          port: ${{ secrets.SERVER_PORT || 22 }}    # SSH 端口，默认为 22 (可选)
+          script: | # 在服务器上执行的命令
+            echo "Connected to server!"
+            cd /opt/blog/  # 假设这是您博客在服务器上的目标路径
+            ls -la
+            echo "Deployment script finished."
+            # 在这里添加您实际的部署命令，例如：
+            # git pull # 如果服务器上也是一个 git 仓库
+            # rsync -avz --delete public/ user@host:/var/www/html/ # 如果需要同步构建后的 public 目录
+            # sudo systemctl restart nginx # 例如重启 Nginx
