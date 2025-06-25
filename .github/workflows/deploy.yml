@@ -27,7 +27,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 8 # 指定您使用的 pnpm 版本，可以从 `pnpm --version` 查看，或者省略以使用最新版
+          version: 9 # 指定您使用的 pnpm 版本，可以从 `pnpm --version` 查看，或者省略以使用最新版
           run_install: false # 我们将在下一步显式运行 install
 
       - name: Get pnpm store directory
