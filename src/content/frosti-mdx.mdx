@@ -1,0 +1,161 @@
+---
+title: "在 Frosti 中使用 MDX"
+description: 在 Frosti 中使用 MDX 来丰富文章内容，添加更多组件
+pubDate: 2025 4 26
+image: /image/image2.jpg
+categories:
+  - tech
+tags:
+  - Frosti
+  - Blog
+  - Project
+---
+
+import Collapse from "../../components/mdx/Collapse.astro";
+import Diff from "../../components/mdx/Diff.astro";
+import Error from "../../components/mdx/Error.astro";
+import Info from "../../components/mdx/Info.astro";
+import Kbd from "../../components/mdx/Kbd.astro";
+import Success from "../../components/mdx/Success.astro";
+import Warning from "../../components/mdx/Warning.astro";
+import TimeLine from "../../components/mdx/TimeLine.astro";
+import LinkCard from "../../components/mdx/LinkCard.astro";
+
+# 前言
+
+## 本文介绍如何在 mdx 中使用 Frosti 提供的组件，以实现普通 md 无法实现的功能。
+
+### 正文
+
+#### 开始使用
+
+#### 首先需要创建一个 .mdx 文件，只需将扩展名改为 .mdx 即可。
+
+#### 引入组件
+
+Frosti 提供的组件位于 /components/mdx 目录中。在文档属性（frontmatter）下方，添加以下导入语句：
+```astro
+import Collapse from "../../components/mdx/Collapse.astro";
+import Diff from "../../components/mdx/Diff.astro";
+import Error from "../../components/mdx/Error.astro";
+import Info from "../../components/mdx/Info.astro";
+import Kbd from "../../components/mdx/Kbd.astro";
+import Success from "../../components/mdx/Success.astro";
+import Warning from "../../components/mdx/Warning.astro";
+import TimeLine from "../../components/mdx/TimeLine.astro";
+import LinkCard from "../../components/mdx/LinkCard.astro";
+```
+
+### 示例
+
+#### Collapse 折叠面板
+
+<Collapse title="This is an example text.">
+  This is the hidden content!
+</Collapse>
+
+```astro
+<Collapse title="This is an example text.">
+  This is the hidden content!
+</Collapse>
+```
+
+#### Diff 差异对比
+
+<Diff r="/image/r.png" l="/image/l.png"></Diff>
+
+```astro
+<Diff r="/image/r.png" l="/image/l.png" />
+```
+
+#### Error 错误提示
+
+Maybe something went wrong?
+
+<Error>Maybe something went wrong?</Error>
+
+```astro
+<Error>Maybe something went wrong? </Error>
+```
+
+#### Warning 警告提示
+
+Hey! Watch out for potholes!
+
+<Warning>Hey! Watch out for potholes! </Warning>
+
+```astro
+<Warning>Hey! Watch out for potholes! </Warning>
+```
+
+#### Info 提示信息
+
+It's just a message.
+
+<Info>It's just a message. </Info>
+
+```astro
+<Info>It's just a message. </Info>
+```
+
+#### Success 成功提示
+
+Congratulations on your successful deployment!
+
+<Success>Congratulations on your successful deployment! </Success>
+
+```astro
+<Success>Congratulations on your successful deployment! </Success>
+```
+
+#### Kbd 键盘按键
+
+Ctrl + C 来复制文本。
+
+<Kbd>Ctrl</Kbd> + <Kbd>C</Kbd> to copy the text.
+
+```astro
+<Kbd>Ctrl</Kbd> + <Kbd>C</Kbd> to copy the text.
+```
+
+#### TimeLine 时间线
+
+<TimeLine
+  items={[
+    { year: "1984", event: "First Macintosh computer" },
+    { year: "1998", event: "iMac" },
+    { year: "2001", event: "iPod" },
+    { year: "2007", event: "iPhone" },
+    { year: "2015", event: "Apple Watch" },
+  ]}
+/>
+
+```astro
+<TimeLine
+  items={[
+    { year: "1984", event: "First Macintosh computer" },
+    { year: "1998", event: "iMac" },
+    { year: "2001", event: "iPod" },
+    { year: "2007", event: "iPhone" },
+    { year: "2015", event: "Apple Watch" },
+  ]}
+/>
+```
+
+#### LinkCard 链接卡片
+
+<LinkCard
+  title="Frosti"
+  desc="My blog project!"
+  url="https://github.com/EveSunMaple/Frosti"
+  img="/view.png"
+/>
+
+```astro
+<LinkCard
+  title="Frosti"
+  desc="My blog project!"
+  url="https://github.com/EveSunMaple/Frosti"
+  img="/view.png"
+/>
+```
