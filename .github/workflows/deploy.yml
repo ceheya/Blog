@@ -30,7 +30,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
         with:
-          version: 8 # 您可以指定 pnpm 的版本，例如 8
+          version: latest
 
       # 第 3 步: 设置 Node.js 环境
       # 安装指定版本的 Node.js，并让它使用已安装的 pnpm 来处理缓存
