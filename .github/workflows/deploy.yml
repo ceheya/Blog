@@ -1,6 +1,6 @@
 # .github/workflows/deploy.yml
 
-name: Build and Deploy Blog
+name: Build and Deploy Astro Blog
 
 on:
   push:
@@ -15,42 +15,51 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # --- 构建步骤 (根据您的项目调整) ---
+      # ------------------------------------------------------------------
+      # 第一步：设置 Node.js 和 pnpm，然后构建您的 Astro 博客
+      # ------------------------------------------------------------------
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
-      - name: Install dependencies
-        run: npm install
-      - name: Build project
-        run: npm run build # 假设构建产物在 dist/
+          node-version: '18' # 或者您在 package.json engines 字段中指定的版本
+          # cache: 'pnpm' # pnpm/action-setup 会处理缓存，这里可以不指定或指定为 pnpm
 
-      # --- 部署步骤 ---
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8 # 指定您使用的 pnpm 版本，可以从 `pnpm --version` 查看，或者省略以使用最新版
+          run_install: false # 我们将在下一步显式运行 install
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile # 使用 --frozen-lockfile 确保使用锁文件的版本
+
+      - name: Build Astro project
+        run: pnpm run build # 假设您的 package.json scripts 中有 "build": "astro build"
+
+      # ------------------------------------------------------------------
+      # 第二步：将构建好的文件部署到服务器
+      # ------------------------------------------------------------------
       - name: Deploy to Server via rsync
         uses: easingthemes/ssh-deploy@v5.0.0
         env:
           SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_KEY }}
           ARGS: "-rlgoDzvc --delete --exclude='.git*'"
-          SOURCE: "dist/"             # 【重要！】构建产物目录
+          SOURCE: "dist/"             # Astro 构建的默认输出目录是 "dist/"
           REMOTE_HOST: ${{ secrets.SERVER_HOST }}
           REMOTE_USER: ${{ secrets.SERVER_USERNAME }}
-          TARGET: ${{ secrets.TARGET_PATH }}  # <--- 在这里使用新的 Secret
-          # SSH_PORT: ${{ secrets.SERVER_PORT || 22 }}
-
-      # 如果您还需要使用 appleboy/ssh-action 执行一些部署后命令，也需要修改路径：
-      - name: Post-deployment commands (Optional)
-        if: always() # 确保即使部署失败也可能执行（或根据需要调整条件）
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          key: ${{ secrets.DEPLOY_KEY }}
-          port: ${{ secrets.SERVER_PORT || 22 }}
-          script: |
-            echo "Performing post-deployment tasks in ${{ secrets.TARGET_PATH }}"
-            cd ${{ secrets.TARGET_PATH }}
-            # 例如：
-            # sudo systemctl restart nginx
-            # pm2 reload my-app
-            echo "Post-deployment tasks finished."
+          TARGET: ${{ secrets.TARGET_PATH }}      # 您服务器上部署的目标路径 (例如 /opt/blog/)
+          # SSH_PORT: ${{ secrets.SERVER_PORT || 22 }} # 如果您的 SSH 端口不是22
