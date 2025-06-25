@@ -3,11 +3,11 @@
   "type": "module",
   "version": "3.1.2",
   "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro check && astro build && pagefind --site dist && xcopy dist\\pagefind public\\ /E /I /Y",
-    "preview": "astro preview",
-    "astro": "astro"
+  "dev": "astro dev",
+  "start": "astro dev",
+  "build": "astro check && astro build && pagefind --site dist && cp -r dist/pagefind public/",
+  "preview": "astro preview",
+  "astro": "astro"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
