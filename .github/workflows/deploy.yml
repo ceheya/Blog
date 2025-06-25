@@ -1,42 +1,56 @@
 # .github/workflows/deploy.yml
 
-name: Deploy Blog to Server # 工作流程的名称
+name: Build and Deploy Blog
 
 on:
   push:
     branches:
-      - main # 仅在推送到 main 分支时触发
+      - main
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest # 使用最新的 Ubuntu 运行器
+  build-and-deploy:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository # 第一步：检出代码
-        uses: actions/checkout@v4 # 使用官方的 checkout action
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      # 如果您的博客需要构建步骤，请在这里添加
-      # 例如，使用 Hugo 构建：
-      # - name: Setup Hugo
-      #   uses: peaceiris/actions-hugo@v2
-      #   with:
-      #     hugo-version: 'latest'
-      # - name: Build Hugo site
-      #   run: hugo
-
-      - name: Deploy to Server via SSH # 第二步：通过 SSH 部署
-        uses: appleboy/ssh-action@master # 一个流行的 SSH action
+      # --- 构建步骤 (根据您的项目调整) ---
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          host: ${{ secrets.SERVER_HOST }}         # 服务器 IP 地址或域名
-          username: ${{ secrets.SERVER_USERNAME }}   # 登录服务器的用户名
-          key: ${{ secrets.DEPLOY_KEY }}          # 您刚刚添加的 SSH 私钥
-          port: ${{ secrets.SERVER_PORT || 22 }}    # SSH 端口，默认为 22 (可选)
-          script: | # 在服务器上执行的命令
-            echo "Connected to server!"
-            cd /opt/blog/  # 假设这是您博客在服务器上的目标路径
-            ls -la
-            echo "Deployment script finished."
-            # 在这里添加您实际的部署命令，例如：
-            # git pull # 如果服务器上也是一个 git 仓库
-            # rsync -avz --delete public/ user@host:/var/www/html/ # 如果需要同步构建后的 public 目录
-            # sudo systemctl restart nginx # 例如重启 Nginx
+          node-version: '18'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm install
+      - name: Build project
+        run: npm run build # 假设构建产物在 dist/
+
+      # --- 部署步骤 ---
+      - name: Deploy to Server via rsync
+        uses: easingthemes/ssh-deploy@v5.0.0
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_KEY }}
+          ARGS: "-rlgoDzvc --delete --exclude='.git*'"
+          SOURCE: "dist/"             # 【重要！】构建产物目录
+          REMOTE_HOST: ${{ secrets.SERVER_HOST }}
+          REMOTE_USER: ${{ secrets.SERVER_USERNAME }}
+          TARGET: ${{ secrets.TARGET_PATH }}  # <--- 在这里使用新的 Secret
+          # SSH_PORT: ${{ secrets.SERVER_PORT || 22 }}
+
+      # 如果您还需要使用 appleboy/ssh-action 执行一些部署后命令，也需要修改路径：
+      - name: Post-deployment commands (Optional)
+        if: always() # 确保即使部署失败也可能执行（或根据需要调整条件）
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          script: |
+            echo "Performing post-deployment tasks in ${{ secrets.TARGET_PATH }}"
+            cd ${{ secrets.TARGET_PATH }}
+            # 例如：
+            # sudo systemctl restart nginx
+            # pm2 reload my-app
+            echo "Post-deployment tasks finished."
