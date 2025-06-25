@@ -29,12 +29,35 @@ jobs:
       - name: Build Project
         run: pnpm run build
 
-      - name: Deploy to Server
-        uses: easingthemes/ssh-deploy@v5.0.0
-        with:
-          sshPrivateKey: ${{ secrets.DEPLOY_KEY }}
-          SOURCE: "dist/"
-          REMOTE_HOST: "119.91.235.233"
-          REMOTE_USER: "root"
-          TARGET: "/opt/blog/"
-          ARGS: "-avz --delete"
+      # ====================================================================
+      # 核心测试步骤：直接使用 SSH 命令测试连接
+      # ====================================================================
+      - name: Test SSH Connection Directly
+        run: |
+          # 1. 为了安全，先创建一个临时的 .ssh 目录
+          mkdir -p ~/.ssh/
+          
+          # 2. 将我们的私钥从 GitHub Secrets 写入一个临时文件
+          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/deploy_key
+          
+          # 3. 设置私钥文件的正确权限，这是 SSH 的强制要求
+          chmod 600 ~/.ssh/deploy_key
+          
+          # 4. 使用原生的 ssh 命令进行连接测试
+          #    -i 指定使用我们刚刚创建的私钥文件
+          #    -o StrictHostKeyChecking=no 避免首次连接时的交互式提问
+          #    最后的 'echo "..."' 是要在服务器上执行的命令
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no root@119.91.235.233 'echo "✅ SSH connection successful!"'
+
+      # ====================================================================
+      # 我们暂时注释掉原来的部署步骤，先不让它运行
+      # ====================================================================
+      # - name: Deploy to Server
+      #   uses: easingthemes/ssh-deploy@v5.0.0
+      #   with:
+      #     sshPrivateKey: ${{ secrets.DEPLOY_KEY }}
+      #     SOURCE: "dist/"
+      #     REMOTE_HOST: "119.91.235.233"
+      #     REMOTE_USER: "root"
+      #     TARGET: "/opt/blog/"
+      #     ARGS: "-avz --delete"
